@@ -11,7 +11,7 @@ socket.on('event', function (data) {
     console.log('event', data)
 
 });
-socket.on('disconnect', function () {
+socket.on('', function () {
     console.log('disconnect')
-    
+
 });
