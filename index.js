@@ -1,4 +1,5 @@
-var socket = require('socket.io-client')('http://localhost:8080');
+const socket = require('socket.io-client')('http://localhost:1234');
+const fetch = require('node-fetch');
 
 
 
