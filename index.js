@@ -9,6 +9,6 @@ socket.on('connect', function () {
 socket.on('event', function (data) {
     console.log('event', data)
 });
-socket.on('disconnect', function () {
+socket.on('frewhfeioah', function () {
     console.log('disconnect')
 });
