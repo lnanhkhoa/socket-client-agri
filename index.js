@@ -1,36 +1,113 @@
-const socket = require('socket.io-client')('http://localhost:1234');
-const fetch = require('node-fetch');
 const _ = require('lodash')
+const client = require('socket.io-client')('http://localhost:1234');
+const fetch = require('node-fetch');
+
+const core = require('./core')
+let interval_listener = []
+
+const home_info = {
+  home_name: 'lesharn_08042019',
+  token_key: 'lesharn_08042019_secret'
+}
+
+const emit_type = {
+  home_join: 'connection/home_join',
+  response_from_home_to_user: 'response_from_home_to_user',
+  send_all_state_home: 'send_all_state_home'
+}
 
 
-socket.on('connect', function () {
-    let event = 'connection/user_join';
-    let data = {
-        user_id: 'lesharn'
-    };
 
-    // Emit connect
-    socket.emit(event, data, (result) => {
-        console.log(event, data, result)
-    });
+client.emitLog = (event, data, callback) => {
+  client.emit(event, data, res => {
+    console.log(new Date(), event, data, res)
+    if (!!callback) callback()
+  })
+}
 
+
+
+
+client.on('disconnect', function () {
+  console.log('disconnect')
+  interval_listener.forEach(element => {
+    clearInterval(element)
+  });
+  interval_listener = []
 });
-socket.on('get_state_all_devices', function (data) {
-    console.log('event', data)
 
-    const list = [{ id: 1, value: 1 }, { id: 2, value: 3 }]
-    const data_feedback = {
-        res: list
-    }
-    socket.emit('event', data_feedback, function (res) {
-        console.log(`send event`, data_feedback, res)
-    })
+client.on('connect', function () {
+  let event = emit_type.home_join;
+  let data = {
+    home_name: home_info.home_name,
+    token_key: home_info.token_key
+  };
 
+  // Emit connect home_join
+  client.emitLog(event, data, (result) => {
+
+    // interval send home info
+    const info_node = core.get_info_node();
+    const instance = setInterval(() => {
+      client.emitLog('send_all_state_home', info_node)
+    }, 5000);
+    interval_listener.push(instance)
+
+    // // send response
+    // emitResponse({
+    //   to: 'ios',
+    //   from: home_info.home_name,
+    //   response_command_type: 'remote_device',
+    //   data: {
+    //     node_name: 'main',
+    //     device_name: 'light',
+    //     value: 'true',
+    //     is_exec: true
+    //   }
+    // })
+
+
+  })
+})
+
+
+
+client.on('command_to_home', function (data) {
+  console.log('nhận tín hiệu điều khiển từ user', data)
+
+  // phản hồi trạng thái từ tín hiệu 
+})
+
+client.on('get_state_all_devices', function (data) {
+  const list = [{ id: 1, value: 1 }, { id: 2, value: 3 }]
+  const data_feedback = {
+    res: list
+  }
+  client.emit('event', data_feedback, function (res) {
+    console.log(`send event`, data_feedback, res)
+  })
 });
-socket.on('disconnect', function () {
-    console.log('disconnect')
 
-});
+
+
+const emitResponse = function (data_response) {
+  client.emitLog(emit_type.response_from_home_to_user, data_response)
+
+}
+
+
+
+module.exports = client;
+
+
+
+
+
+
+
+
+
+
 
 
 // //Get Lux value of 4c18
