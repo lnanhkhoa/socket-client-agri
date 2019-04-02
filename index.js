@@ -1,13 +1,14 @@
 const _ = require('lodash')
-const client = require('socket.io-client')('http://localhost:1234');
+const client = require('socket.io-client')('http://45.117.168.231:1234');
 const fetch = require('node-fetch');
+const static = require('./static');
 
 const core = require('./core')
 let interval_listener = []
 
 const home_info = {
-  home_name: 'lesharn_08042019',
-  token_key: 'lesharn_08042019_secret'
+  home_name: 'leshan_08042019',
+  token_key: 'leshan_08042019_secret'
 }
 
 const emit_type = {
@@ -44,16 +45,17 @@ client.on('connect', function () {
   };
 
   // Emit connect home_join
-  client.emitLog(event, data, (result) => {
+  client.emitLog(event, data, async result => {
 
     // interval send home info
-    const info_node = core.get_info_node();
+    const info_node = await core.get_all_info();
+    console.log(info_node)
     const instance = setInterval(() => {
       client.emitLog('send_all_state_home', info_node)
-    }, 5000);
+    }, 10000);
     interval_listener.push(instance)
 
-    // // send response
+    // send response
     // emitResponse({
     //   to: 'ios',
     //   from: home_info.home_name,
