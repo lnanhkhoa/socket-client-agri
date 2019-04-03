@@ -4,5 +4,5 @@ module.exports = {
         port: 1234
     },
     host_leshan: 'http://localhost:8080',
-    timeInterval_sendAll: 10000
+    timeInterval_sendAll: 5000
 }
