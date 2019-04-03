@@ -1,6 +1,6 @@
 module.exports = {
     server: {
-        host: '57d4655e.ap.ngrok.io',
+        host: 'd1fcdbd8.ap.ngrok.io',
         // port: 1234
     },
     host_leshan: 'http://localhost:8080',
