@@ -51,7 +51,7 @@ client.on('connect', function () {
             data: { 
                 node_name: 'main',
                 device_name: 'light',
-                value: 'true'
+                value: true
              }
         })
 
