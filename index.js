@@ -1,5 +1,7 @@
 const _ = require('lodash')
-const client = require('socket.io-client')('http://45.117.168.231:1234');
+const config = require('./config')
+const { timeInterval_sendAll } = config
+const client = require('socket.io-client')(`http://${config.server.host}:${config.server.port}`);
 const fetch = require('node-fetch');
 const static = require('./static');
 
@@ -48,11 +50,18 @@ client.on('connect', function () {
   client.emitLog(event, data, async result => {
 
     // interval send home info
-    const info_node = await core.get_all_info();
-    console.log(info_node)
-    const instance = setInterval(() => {
-      client.emitLog('send_all_state_home', info_node)
-    }, 10000);
+    const instance = setInterval(async () => {
+      const info_node = await core.get_all_info();
+      console.log(info_node)
+      try {
+        if (!info_node) throw { code: 'info_node_null' }
+        if (!!info_node && info_node.length === 0) throw { code: 'info_node_[]' }
+        client.emitLog('send_all_state_home', { send_all_state_home: info_node })
+      }
+      catch (error) {
+        console.log('error send_all_state_home', info_node)
+      }
+    }, timeInterval_sendAll);
     interval_listener.push(instance)
 
     // send response
