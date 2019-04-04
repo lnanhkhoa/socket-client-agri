@@ -10,6 +10,9 @@ const static = require('./static');
 const core = require('./core')
 let interval_listener = []
 
+
+console.log('run NODE_ENV', process.env.NODE_ENV)
+
 const home_info = {
   home_name: 'leshan_08042019',
   token_key: 'leshan_08042019_secret'
