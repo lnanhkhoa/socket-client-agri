@@ -2,8 +2,9 @@ const _ = require('lodash')
 // const static = require('./static')
 const config = require('./config')
 const { timeInterval_sendAll } = config
-// const client = require('socket.io-client')(`http://${config.server.host}:${config.server.port}`);
-const client = require('socket.io-client')(`http://localhost:1234`);
+const client = require('socket.io-client')(`http://${config.server.host}:${config.server.port}`);
+console.log('connect', `http://${config.server.host}:${config.server.port}`);
+// const client = require('socket.io-client')(`http://localhost:1234`);
 const fetch = require('node-fetch');
 const static = require('./static');
 

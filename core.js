@@ -4,6 +4,7 @@ const static = require('./static');
 const config = require('./config')
 const core = {}
 const host_leshan = config.host_leshan;
+console.log('host_leshan', host_leshan)
 
 const list_apis = {
     get_all_node_name: '/api/clients'

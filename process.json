@@ -1,0 +1,7 @@
+{
+    "name": "client-socket",
+    "script": "yarn start",
+    "env": {
+        "NODE_ENV": "production"
+    }
+}
