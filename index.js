@@ -74,6 +74,12 @@ client.on('connect', function () {
 })
 
 
+function consoleCatch(e) {
+  console.log(e)
+  return null
+}
+
+
 
 client.on('command_to_home', async function (payload) {
   console.log('nhận tín hiệu điều khiển từ user')
@@ -82,7 +88,27 @@ client.on('command_to_home', async function (payload) {
   const value_control = value ? 'true' : 'false';
   const object_device = _.find(static.object_device, device => device.url === url);
   const url_link = `${config.host_leshan}/api/clients/${node_name}${url}/${object_device.valueId}?format=TLV`
-  console.log(url_link)
+
+  // // dev
+  // client.emitLog('send_all_state_home', {
+  //   send_all_state_home: [],
+  //   is_forwarding: true,
+  //   info_forwarding: {
+  //     to: 'ios',
+  //     from: home_info.home_name,
+  //     response_command_type: 'remote_device',
+  //     data: {
+  //       node_name: node_name,
+  //       url: url,
+  //       value: value,
+  //       is_exec: true
+  //     }
+  //   }
+  // })
+  // return true
+
+
+
 
   const response = await core.fetch_put({
     url_link: url_link,
@@ -91,8 +117,10 @@ client.on('command_to_home', async function (payload) {
       value: value_control
     }
   })
-
-  const response_one_node = (await core.get_one_node(node_name)).body;
+  if (!response.meta.success) return consoleCatch('cant remote')
+  const _response_one_node = await core.get_one_node(node_name);
+  if (!response_one_node.meta.success) return consoleCatch('cant remote')
+  const response_one_node = _response_one_node.body;
   const data_node = await core.get_info_in_one_node(node_name, response_one_node.objectLinks)
 
   const info_node = [{
@@ -101,13 +129,13 @@ client.on('command_to_home', async function (payload) {
     address: response_one_node.address,
     data: data_node
   }]
-  // const info_node = await core.get_all_info()
   try {
     if (!info_node) throw { code: 'info_node_null' }
-    if (!!info_node && info_node.length === 0) throw { code: 'info_node_[]' }
-    client.emitLog('send_all_state_home', { send_all_state_home: info_node }, res => {
-      // send response
-      emitResponse({
+    if (!!info_node && info_node.length === 0) return consoleCatch({ code: 'info_node_[]' })
+    client.emitLog('send_all_state_home', {
+      send_all_state_home: info_node,
+      is_forwarding: true,
+      info_forwarding: {
         to: 'ios',
         from: home_info.home_name,
         response_command_type: 'remote_device',
@@ -117,35 +145,21 @@ client.on('command_to_home', async function (payload) {
           value: value,
           is_exec: !!response.meta.success
         }
-      })
+      }
     })
   }
   catch (error) {
     console.log('error send_all_state_home', info_node)
   }
-
-
-
-
   // phản hồi trạng thái từ tín hiệu 
 })
 
-client.on('get_state_all_devices', function (data) {
-  const list = [{ id: 1, value: 1 }, { id: 2, value: 3 }]
-  const data_feedback = {
-    res: list
-  }
-  client.emit('event', data_feedback, function (res) {
-    console.log(`send event`, data_feedback, res)
-  })
-});
 
 
+// const emitResponse = function (data_response) {
+//   client.emitLog(emit_type.response_from_home_to_user, data_response)
 
-const emitResponse = function (data_response) {
-  client.emitLog(emit_type.response_from_home_to_user, data_response)
-
-}
+// }
 
 
 

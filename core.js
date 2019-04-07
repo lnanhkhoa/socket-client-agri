@@ -16,7 +16,6 @@ core.fetch_get = async url_link => {
         response = await fetch(url_link)
             .then(r => r.json().then(data => ({ status: r.status, meta: { success: true }, body: data })))
     } catch (e) {
-        console.log(e)
         return { status: 500, meta: { success: false }, code: 'response_body_not_found' };
     }
     // if (!response || response.status != 200) throw { code: 'error' };
@@ -34,7 +33,6 @@ core.fetch_post = async (url_link, data) => {
         })
             .then(r => r.json().then(data => ({ status: r.status, meta: { success: true }, body: data })))
     } catch (e) {
-        console.log(e)
         return { status: 500, meta: { success: false }, code: 'response_body_not_found' };
     }
     // if (!response || response.status != 200) throw { code: 'error' };
@@ -56,7 +54,6 @@ core.fetch_put = async ({ url_link, body }) => {
         })
             .then(r => r.json().then(data => ({ status: r.status, meta: { success: true }, body: data })))
     } catch (e) {
-        console.log(e)
         return { status: 500, meta: { success: false }, code: 'response_body_not_found' };
     }
     // if (!response || response.status != 200) throw { code: 'error' };

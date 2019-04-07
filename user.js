@@ -1,6 +1,11 @@
 const _ = require('lodash')
-const client = require('socket.io-client')('http://localhost:1234');
 const fetch = require('node-fetch');
+const config = require('./config')
+
+const client = require('socket.io-client')(`http://${config.server.host}:${config.server.port}`);
+console.log('connect', `http://${config.server.host}:${config.server.port}`);
+// const client = require('socket.io-client')(`http://localhost:1234`);
+
 
 const core = require('./core')
 let interval_listener = []
@@ -62,7 +67,7 @@ client.on('connect', function () {
 });
 
 client.on('response_to_user', function (data) {
-    console.log('user đã nhận được response từ home', data)
+    // console.log('user đã nhận được response từ home', data)
 })
 
 
