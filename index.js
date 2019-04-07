@@ -56,18 +56,18 @@ client.on('connect', function () {
   client.emitLog(event, data, async result => {
 
     // interval send home info
-    // const instance = setInterval(async () => {
-    //   const info_node = await core.get_all_info();
-    //   try {
-    //     if (!info_node) throw { code: 'info_node_null' }
-    //     if (!!info_node && info_node.length === 0) throw { code: 'info_node_[]' }
-    //     client.emitLog('send_all_state_home', { send_all_state_home: info_node })
-    //   }
-    //   catch (error) {
-    //     console.log('error send_all_state_home', info_node)
-    //   }
-    // }, timeInterval_sendAll);
-    // interval_listener.push(instance)
+    const instance = setInterval(async () => {
+      const info_node = await core.get_all_info();
+      try {
+        if (!info_node) return consoleCatch({ code: 'info_node_null' })
+        if (!!info_node && info_node.length === 0) return consoleCatch({ code: 'info_node_[]' })
+        client.emitLog('send_all_state_home', { send_all_state_home: info_node })
+      }
+      catch (error) {
+        console.log('error send_all_state_home', info_node)
+      }
+    }, timeInterval_sendAll);
+    interval_listener.push(instance)
 
 
   })
