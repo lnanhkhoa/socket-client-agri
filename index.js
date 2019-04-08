@@ -56,7 +56,7 @@ client.on('connect', function () {
   client.emitLog(event, data, async result => {
 
     // interval send home info
-    const instance = setInterval(async () => {
+    // const instance = setInterval(async () => {
       const info_node = await core.get_all_info();
       try {
         if (!info_node) return consoleCatch({ code: 'info_node_null' })
@@ -66,8 +66,8 @@ client.on('connect', function () {
       catch (error) {
         console.log('error send_all_state_home', info_node)
       }
-    }, timeInterval_sendAll);
-    interval_listener.push(instance)
+    // }, timeInterval_sendAll);
+    // interval_listener.push(instance)
 
 
   })
