@@ -119,7 +119,7 @@ client.on('command_to_home', async function (payload) {
   })
   if (!response.meta.success) return consoleCatch('cant remote')
   const _response_one_node = await core.get_one_node(node_name);
-  if (!response_one_node.meta.success) return consoleCatch('cant remote')
+  if (!_response_one_node.meta.success) return consoleCatch('cant remote')
   const response_one_node = _response_one_node.body;
   const data_node = await core.get_info_in_one_node(node_name, response_one_node.objectLinks)
 
