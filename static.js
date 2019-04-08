@@ -31,8 +31,15 @@ module.exports = {
             valueType: 'number',
         },
         {
-            name: 'Pressure',
+            name: 'Soil Moisture',
             url: '/3323/0',
+            valueId: 5700,
+            unitId: 5701,
+            valueType: 'number',
+        },
+        {
+            name: 'Soil Temp',
+            url: '/3324/0',
             valueId: 5700,
             unitId: 5701,
             valueType: 'number',

@@ -101,8 +101,8 @@ core.get_info_in_one_node = async (endpoint, list_objectLinks) => {
         const response_list_value = response.body.content.resources;
         const value_object = _.find(response_list_value, res => res.id === object_device.valueId);
         if (typeof value_object.value !== object_device.valueType) return returnNull
-        const unit_object = _.find(response_list_value, res => res.id === object_device.unitId);
-
+        const _unit_object = _.find(response_list_value, res => res.id === object_device.unitId);
+        const unit_object = device.url === '/3323/0' ? '%' : _unit_object;
         return {
             name: object_device.name,
             url: device.url,
