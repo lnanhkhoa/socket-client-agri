@@ -18,8 +18,6 @@ core.fetch_get = async url_link => {
     } catch (e) {
         return { status: 500, meta: { success: false }, code: 'response_body_not_found' };
     }
-    // if (!response || response.status != 200) throw { code: 'error' };
-    // if (!response.body) throw { code: 'response_body_not_found' };
     return response
 }
 
@@ -35,8 +33,6 @@ core.fetch_post = async (url_link, data) => {
     } catch (e) {
         return { status: 500, meta: { success: false }, code: 'response_body_not_found' };
     }
-    // if (!response || response.status != 200) throw { code: 'error' };
-    // if (!response.body) throw { code: 'response_body_not_found' };
     return response
 }
 
@@ -56,8 +52,6 @@ core.fetch_put = async ({ url_link, body }) => {
     } catch (e) {
         return { status: 500, meta: { success: false }, code: 'response_body_not_found' };
     }
-    // if (!response || response.status != 200) throw { code: 'error' };
-    // if (!response.body) throw { code: 'response_body_not_found' };
     return response
 }
 
@@ -95,7 +89,8 @@ core.get_info_in_one_node = async (endpoint, list_objectLinks) => {
         const object_device = _.find(static_object_device, _device => _device.url === device.url);
         if (!object_device) return returnNull
 
-        const response = await core.fetch_get(`${host_leshan}/api/clients/${endpoint}${device.url}?format=TLV`)
+        const url_thaythe = _.includes(static.list_special, device.url) ? device.url.replace('3311', '3200') : device.url
+        const response = await core.fetch_get(`${host_leshan}/api/clients/${endpoint}${url_thaythe}?format=TLV`)
         if (!response.meta.success) return returnNull
 
         const response_list_value = response.body.content.resources;
@@ -123,7 +118,6 @@ core.get_all_info = async () => {
         const static_object_device = static.object_device;
         const listObjectDeviceUrl = _.map(static_object_device, object => object.url)
         const list_object_links = _.reject(objectLinks, obj => !_.includes(listObjectDeviceUrl, obj.url));
-        console.log(list_object_links)
         const data_node = await core.get_info_in_one_node(endpoint, list_object_links)
         return {
             ..._.omit(node, ['objectLinks', 'lifetime']),

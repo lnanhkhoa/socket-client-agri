@@ -1,10 +1,12 @@
 module.exports = {
     device_type: ['Illuminance', 'Temperature', 'Humidity', 'Pressure', 'Light Control'],
+    list_special: ['/3311/0', '/3311/1', '/3311/2'],
     object_device: [
         {
             name: 'Pump 1',
             url: '/3311/0',
-            valueId: 5850,
+            valueId: 5500,
+            controlId: 5850,
             unitId: undefined,
             valueType: 'boolean',
             controllable: true
@@ -12,7 +14,8 @@ module.exports = {
         {
             name: 'Pump 2',
             url: '/3311/1',
-            valueId: 5850,
+            valueId: 5500,
+            controlId: 5850,
             unitId: undefined,
             valueType: 'boolean',
             controllable: true
@@ -20,7 +23,8 @@ module.exports = {
         {
             name: 'Pump 3',
             url: '/3311/2',
-            valueId: 5850,
+            valueId: 5500,
+            controlId: 5850,
             unitId: undefined,
             valueType: 'boolean',
             controllable: true

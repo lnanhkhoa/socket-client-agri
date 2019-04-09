@@ -49,16 +49,16 @@ client.on('connect', function () {
     client.emitLog(emit_type.user_join, data_user_join, (res_join_room) => {
 
         // control device
-        client.emitLog(emit_type.command_to_home_from_user, {
-            from: user_info.user_name,
-            to: 'lesharn_08042019',
-            command_type: 'remote_device',
-            data: { 
-                node_name: 'main',
-                device_name: 'light',
-                value: true
-             }
-        })
+        // client.emitLog(emit_type.command_to_home_from_user, {
+        //     from: user_info.user_name,
+        //     to: 'lesharn_08042019',
+        //     command_type: 'remote_device',
+        //     data: { 
+        //         node_name: 'main',
+        //         device_name: 'light',
+        //         value: true
+        //      }
+        // })
 
         // client.emit(emit_type.get_all_home_state, data, (res) => {
         //     console.log('all home state', res)
