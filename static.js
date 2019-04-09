@@ -2,8 +2,24 @@ module.exports = {
     device_type: ['Illuminance', 'Temperature', 'Humidity', 'Pressure', 'Light Control'],
     object_device: [
         {
-            name: 'Light Control',
+            name: 'Pump 1',
             url: '/3311/0',
+            valueId: 5850,
+            unitId: undefined,
+            valueType: 'boolean',
+            controllable: true
+        },
+        {
+            name: 'Pump 2',
+            url: '/3311/1',
+            valueId: 5850,
+            unitId: undefined,
+            valueType: 'boolean',
+            controllable: true
+        },
+        {
+            name: 'Pump 3',
+            url: '/3311/2',
             valueId: 5850,
             unitId: undefined,
             valueType: 'boolean',
