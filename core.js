@@ -79,6 +79,45 @@ core.get_one_node = async (endpoint) => {
 
 
 
+function consoleCatch(e) {
+    console.log(e)
+    return null
+}
+
+
+core.turn_on_pump = async index => {
+    const url_link = `${config.host_leshan}/api/clients/Contiki-NG-1.04B0005B3BFB2/3311/${index}/5850?format=TLV`
+    const response = await core.fetch_put({
+        url_link: url_link,
+        body: {
+            id: 5850,
+            value: 'true'
+        }
+    })
+    if (!response.meta.success) return consoleCatch(`cant turn pump ${index}`)
+    console.log(`turn on pump ${index}`)
+    return response.body
+}
+
+
+core.turn_off_pump = async index => {
+    const url_link = `${config.host_leshan}/api/clients/Contiki-NG-1.04B0005B3BFB2/3311/${index}/5850?format=TLV`
+    const response = await core.fetch_put({
+        url_link: url_link,
+        body: {
+            id: 5850,
+            value: 'false'
+        }
+    })
+    if (!response.meta.success) return consoleCatch(`cant turn pump ${index}`)
+    console.log(`turn off pump ${index}`)
+    return response.body
+}
+
+
+
+
+
 
 core.get_info_in_one_node = async (endpoint, list_objectLinks) => {
     const list_pm_resources = list_objectLinks.map(async device => {

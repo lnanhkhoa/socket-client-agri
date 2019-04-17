@@ -5,6 +5,6 @@ module.exports = {
         port: 1234,
     },
     host_leshan: 'http://localhost:8080',
-    // host_leshan: 'http://8bf2a8f4.ap.ngrok.io',
+    // host_leshan: 'http://9d5d26d4.ap.ngrok.io',
     timeInterval_sendAll: 120000
 }

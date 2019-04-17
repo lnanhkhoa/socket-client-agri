@@ -19,3 +19,10 @@ const static_object_device = static.object_device;
 const listObjectDeviceUrl = _.map(static_object_device, object => object.url)
 const list_object_links = _.reject(objectLinks, obj => !_.includes(listObjectDeviceUrl, obj.url));
 console.log(list_object_links)
+
+
+const obje = {
+    a: 1,
+    b: 2
+}
+console.log(_.values(obje))

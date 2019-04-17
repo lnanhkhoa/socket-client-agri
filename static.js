@@ -64,5 +64,14 @@ module.exports = {
             unitId: 5701,
             valueType: 'number',
         },
+    ],
+    list_garden: [
+        {
+            garden_id: 1,
+            list_node: ['Contiki-NG-1.04B0005B3BFBC', 'Contiki-NG-1.04B0005B3BFDA'],
+            device_url: '/3323/0',
+            min_range: 170,
+            max_range: 800
+        }
     ]
 }
