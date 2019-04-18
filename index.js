@@ -71,8 +71,12 @@ client.on('connect', function () {
 })
 
 
-function setIntervalRemote(params) {
+function clearIntervalRemote(params) {
   clearInterval(interval_listener.update_config)
+}
+
+
+function setIntervalRemote(params) {
   const instance1 = setInterval(async () => {
     payload_config = await get_config_remote()
     // remote pump from humidity sensor value
@@ -186,7 +190,6 @@ async function get_config_remote(params) {
 }
 
 
-
 async function remote_pump_auto(params) {
   payload_config = (!!payload_config && payload_config.length === 0) ? await get_config_remote() : payload_config
   const info_node = await core.get_all_info();
@@ -242,12 +245,12 @@ async function remote_pump_auto(params) {
 
 }
 
-
 client.on('config_remote_pump_automatically', async function (payload) {
   // like get_config_remote
   const list_config = payload.data.list_data
   payload_config = list_config
   await remote_pump_auto()
+  clearIntervalRemote()
   setIntervalRemote()
 
 })
