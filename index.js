@@ -77,7 +77,7 @@ function setIntervalRemote(params) {
     payload_config = await get_config_remote()
     // remote pump from humidity sensor value
     await remote_pump_auto()
-  }, 3600 * 1000);
+  }, 120 * 1000);
   interval_listener.update_config = instance1
 }
 
