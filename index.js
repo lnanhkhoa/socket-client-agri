@@ -221,7 +221,7 @@ async function remote_pump_auto(params) {
 
     const list_humidity_values = _.compact(_list_humidity_values)
     if (list_humidity_values.length === 0) return null
-    const real_mean_humidity_val = _.mean(list_humidity_values);I
+    const real_mean_humidity_val = _.mean(list_humidity_values)
     // reference
     const config_garden_one = _.find(payload_config, config => {
       return config.object_type === 'GARDEN' && config.object_id === garden_index
