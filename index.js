@@ -195,7 +195,7 @@ async function remote_pump_auto(params) {
   const info_node = await core.get_all_info();
   if (info_node.length === 0) return null
 
-  await _.forEach(static.list_garden, async static_garden => {
+  await _.forEach(payload_config, async static_garden => {
 
     const garden_index = static_garden.garden_id
     const static_garden_one = _.find(static.list_garden, gar => gar.garden_id === garden_index)
