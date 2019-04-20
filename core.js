@@ -58,7 +58,6 @@ core.fetch_put = async ({ url_link, body }) => {
 
 core.get_all_node = async () => {
     const url = `${host_leshan}${list_apis.get_all_node_name}`
-    console.log(url)
     const response = await core.fetch_get(url)
     const list_node_name = response.meta.success ? response.body : [];
     // console.log(list_node_name)
@@ -71,13 +70,32 @@ core.get_all_node = async () => {
     }))
 }
 
+core.get_all_one_node = async (endpoint) => {
+    const response = await core.get_one_node(endpoint)
+    const node_existed = response.meta.success ? response.body : [];
+    const node_info = {
+        endpoint: node_existed.endpoint,
+        registrationId: node_existed.registrationId,
+        address: node_existed.address,
+        lifetime: node_existed.lifetime,
+        objectLinks: node_existed.objectLinks
+    }
+    const static_object_device = static.object_device;
+    const listObjectDeviceUrl = _.map(static_object_device, object => object.url)
+    const { objectLinks } = node_info
+    const list_object_links = _.reject(objectLinks, obj => !_.includes(listObjectDeviceUrl, obj.url));
+    const data_node = await core.get_info_in_one_node(endpoint, list_object_links)
+    return {
+        ..._.omit(node_info, ['objectLinks', 'lifetime']),
+        data: data_node
+    }
+}
+
 
 core.get_one_node = async (endpoint) => {
     const url = `${config.host_leshan}/api/clients/${endpoint}`
     return await core.fetch_get(url)
 }
-
-
 
 function consoleCatch(e) {
     console.log(e)
@@ -151,7 +169,6 @@ core.get_info_in_one_node = async (endpoint, list_objectLinks) => {
 core.get_all_info = async () => {
     const all_node = await core.get_all_node()
     // // const list_endpoint_all_node = all_node.map(node => node.endpoint)
-
     return await Promise.all(all_node.map(async node => {
         const { objectLinks, endpoint } = node
         const static_object_device = static.object_device;
@@ -163,9 +180,11 @@ core.get_all_info = async () => {
             data: data_node
         }
     }))
-
-
 }
+
+core.get_all_node
+
+
 
 
 // core.get_info_all_node = () => {

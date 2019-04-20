@@ -27,7 +27,8 @@ let payload_config = []
 
 client.emitLog = (event, data, callback) => {
   client.emit(event, data, res => {
-    console.log(new Date(), event, data, res)
+    console.log(new Date(), event, data)
+    console.log("----------------------------------------------")
     if (!!callback) callback()
   })
 }
@@ -41,6 +42,7 @@ client.on('disconnect', function () {
   _.values(timeout_listener).forEach(element => {
     clearTimeout(element)
   });
+  clearAllIntervalRemote()
   interval_listener = {}
   timeout_listener = {}
 });
@@ -54,7 +56,6 @@ client.on('connect', function () {
 
   // Emit connect home_join
   client.emitLog(event, data, async result => {
-
     // interval send home info
     await update_all_node()
     const instance = setInterval(async () => {
@@ -64,28 +65,46 @@ client.on('connect', function () {
 
     // update payload_config
     payload_config = await get_config_remote()
-    await remote_pump_auto()
-    setIntervalRemote()
-
+    const config_isallowed = payload_config.filter(cf => !!cf.status)
+    await remote_pump_auto(config_isallowed)
+    await setIntervalRemote(config_isallowed)
   })
 })
 
-
-function clearIntervalRemote(params) {
-  clearInterval(interval_listener.update_config)
+function clearAllIntervalRemote() {
+  const list_idInterval = _.values(interval_listener.update_config)
+  clearInterval(list_idInterval)
 }
 
-
-function setIntervalRemote(params) {
-  const instance1 = setInterval(async () => {
-    payload_config = await get_config_remote()
-    // remote pump from humidity sensor value
-    await remote_pump_auto()
-  }, 120 * 1000);
-  interval_listener.update_config = instance1
+async function setIntervalRemote(payload_config) {
+  clearAllIntervalRemote()
+  payload_config.forEach((config, index) => {
+    const cycle_time = config.cycle_time || 1;
+    const instance = setInterval(async () => {
+      // remote pump from humidity sensor value
+      await remote_pump_auto([config])
+    }, cycle_time * 60 * 1000 + index * 408);
+    interval_listener.update_config = {
+      [index]: instance
+    }
+  })
 }
 
-
+function sendNotiToUser({ message, node_info }) {
+  console.log('node_info', node_info)
+  client.emitLog('send_all_state_home', {
+    send_all_state_home: [node_info],
+    is_forwarding: true,
+    info_forwarding: {
+      to: 'ios',
+      from: home_info.home_name,
+      response_command_type: 'need_update',
+      data: {
+        status: JSON.stringify({ message: message })
+      }
+    }
+  })
+}
 
 async function update_all_node() {
   const info_node = await core.get_all_info();
@@ -190,18 +209,42 @@ async function get_config_remote(params) {
 }
 
 
-async function remote_pump_auto(params) {
-  payload_config = (!!payload_config && payload_config.length === 0) ? await get_config_remote() : payload_config
+async function get_garden_info(params) {
+  const response = await core.fetch_get(
+    `${serverHost}/api/garden/get_info?user_name=ios&user_token_key=ios_android_secret&home_name=${home_info.home_name}`)
+  if (!response.meta.success) return undefined
+  return response.body.data
+}
+
+
+
+async function remote_pump_auto(payload_config) {
+  if (!!payload_config && payload_config.length === 0) return null
   const info_node = await core.get_all_info();
   if (info_node.length === 0) return null
+  const static_list_garden = await get_garden_info()
 
-  await _.forEach(static.list_garden, async static_garden => {
+  // const list_garden_onStatus = payload_config.filter(i => !!i.status)
 
+  _.forEach(static_list_garden, async static_garden => {
+    // reference
     const garden_index = static_garden.garden_id
-    const static_garden_one = _.find(static.list_garden, gar => gar.garden_id === garden_index)
+
+    const config_garden_one = _.find(payload_config, config => {
+      return config.object_type === 'GARDEN'
+        && config.object_id === garden_index
+        && config.status === true
+    })
+
+    if (!config_garden_one) return consoleCatch({ code: 'garden_is_off' })
+
+
+    const __static_garden_one = _.find(static.list_garden, gar => gar.garden_id === garden_index)
+    const _static_garden_one = _.find(static_list_garden, gar => gar.garden_id === garden_index)
+    const static_garden_one = { ...__static_garden_one, ..._static_garden_one }
     // data in process
     const list_node_in_garden = _.filter(info_node, node => {
-      return _.includes(static_garden_one.list_node, node.endpoint)
+      return _.includes(static_garden_one.list_node_name, node.endpoint)
     })
     if (list_node_in_garden.length === 0) return null
 
@@ -225,18 +268,29 @@ async function remote_pump_auto(params) {
     const list_humidity_values = _.compact(_list_humidity_values)
     if (list_humidity_values.length === 0) return null
     const real_mean_humidity_val = _.mean(list_humidity_values)
-    // reference
-    const config_garden_one = _.find(payload_config, config => {
-      return config.object_type === 'GARDEN' && config.object_id === garden_index
-    })
-    if (real_mean_humidity_val > config_garden_one.mean_humidity_value) return null
 
-    console.info(new Date(), `Real Mean Humidity value < value_in_Config, so turn the Pump in Garden`, _list_humidity_values)
+
+    if (real_mean_humidity_val > config_garden_one.mean_humidity_value) {
+      console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) > value_in_Config(${config_garden_one.mean_humidity_value}), so do nothing`, _list_humidity_values)
+      return null
+    }
+
+    console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) < value_in_Config(${config_garden_one.mean_humidity_value}), so turn on the Pump in Garden`, _list_humidity_values)
 
     // turn ON/OFF PUMP
-    await core.turn_on_pump(garden_index - 1)
+    const resOn = await core.turn_on_pump(garden_index - 1)
+    const data_node_control = await core.get_all_one_node('Contiki-NG-1.04B0005B3BFB2')
+    if (!!resOn) sendNotiToUser({
+      message: `pump${garden_index} ON`,
+      node_info: data_node_control
+    })
     timeout_listener[`remote_pump_auto_${garden_index}`] = setTimeout(async () => {
-      await core.turn_off_pump(garden_index - 1)
+      const resOff = await core.turn_off_pump(garden_index - 1)
+      const _data_node_control = await core.get_all_one_node('Contiki-NG-1.04B0005B3BFB2')
+      if (!!resOff) sendNotiToUser({
+        message: `pump${garden_index} OFF`,
+        node_info: _data_node_control
+      })
     }, config_garden_one.about_time * 60 * 1000);
 
 
@@ -249,10 +303,8 @@ client.on('config_remote_pump_automatically', async function (payload) {
   // like get_config_remote
   const list_config = payload.data.list_data
   payload_config = list_config
-  await remote_pump_auto()
-  clearIntervalRemote()
-  setIntervalRemote()
-
+  await setIntervalRemote(config_isallowed)
+  await remote_pump_auto(config_isallowed)
 })
 
 
