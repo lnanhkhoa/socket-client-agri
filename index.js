@@ -303,6 +303,7 @@ client.on('config_remote_pump_automatically', async function (payload) {
   // like get_config_remote
   const list_config = payload.data.list_data
   payload_config = list_config
+  const config_isallowed = payload_config.filter(cf => !!cf.status)
   await setIntervalRemote(config_isallowed)
   await remote_pump_auto(config_isallowed)
 })
