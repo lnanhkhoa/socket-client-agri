@@ -257,7 +257,7 @@ async function remote_pump_auto(payload_config) {
       })
     }
     const list_humidity = await getListHumidityInGarden(list_node_in_garden, static_garden_one)
-    console.log('list_humidity_values', list_humidity_values)
+    console.log('list_humidity', list_humidity)
     if (!!list_humidity && list_humidity.length === 0) return consoleCatch({ code: `get_list_humidity_empty` })
     const _list_humidity_vals = list_humidity.map(i => i.value)
     if (!!_list_humidity_vals && _list_humidity_vals.length === 0) return consoleCatch({ code: `get_list_humidity_empty` })
