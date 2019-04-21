@@ -257,6 +257,7 @@ async function remote_pump_auto(payload_config) {
       })
     }
     const list_humidity = await getListHumidityInGarden(list_node_in_garden, static_garden_one)
+    if (!!list_humidity && list_humidity.length === 0) return consoleCatch({ code: `get_list_humidity_empty` })
     const _list_humidity_vals = list_humidity.map(i => i.value)
     const __list_humidity_values = _list_humidity_vals.map(value => {
       if (value > 850 || value < 170) return null
