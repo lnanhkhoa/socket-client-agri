@@ -71,7 +71,7 @@ module.exports = {
             list_node_name: ['Contiki-NG-1.04B0005B3BFBC', 'Contiki-NG-1.04B0005B3BFDA'],
             device_url: '/3323/0',
             min_range: 170,
-            max_range: 800
+            max_range: 850
         }
     ]
 }

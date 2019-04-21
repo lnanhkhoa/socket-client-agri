@@ -259,13 +259,16 @@ async function remote_pump_auto(payload_config) {
     }
     const list_humidity = await getListHumidityInGarden(list_node_in_garden, static_garden_one)
     const _list_humidity_vals = list_humidity.map(i => i.value)
-    const _list_humidity_values = _list_humidity_vals.map(value => {
+    const __list_humidity_values = _list_humidity_vals.map(value => {
       if (value > 1000) return null
       if (value < 0) return null
       return value
     })
 
-    const list_humidity_values = _.compact(_list_humidity_values)
+    const _list_humidity_values = _.compact(__list_humidity_values)
+
+    //validate
+    const list_humidity_values = _.reject(_list_humidity_values, val => val < 170 || val > 850)
     if (list_humidity_values.length === 0) return null
     const real_mean_humidity_val = _.mean(list_humidity_values)
 
