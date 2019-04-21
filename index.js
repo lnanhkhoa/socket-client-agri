@@ -245,7 +245,7 @@ async function remote_pump_auto(payload_config) {
     const list_node_in_garden = _.filter(info_node, node => {
       return _.includes(static_garden_one.list_node_name, node.endpoint)
     })
-    if (list_node_in_garden.length === 0) return consoleCatch({ code: `node_in_garden_already_offline` })
+    if (list_node_in_garden.length === 0) return consoleCatch({ code: `node_in_garden${garden_index}_already_offline` })
 
     const getListHumidityInGarden = async (list_node_in_garden, static_garden_one) => {
       return list_node_in_garden.map(node => {
