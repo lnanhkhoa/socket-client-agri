@@ -257,8 +257,10 @@ async function remote_pump_auto(payload_config) {
       })
     }
     const list_humidity = await getListHumidityInGarden(list_node_in_garden, static_garden_one)
+    console.log('list_humidity_values', list_humidity_values)
     if (!!list_humidity && list_humidity.length === 0) return consoleCatch({ code: `get_list_humidity_empty` })
     const _list_humidity_vals = list_humidity.map(i => i.value)
+    if (!!_list_humidity_vals && _list_humidity_vals.length === 0) return consoleCatch({ code: `get_list_humidity_empty` })
     const __list_humidity_values = _list_humidity_vals.map(value => {
       if (value > 850 || value < 170) return null
       return value
@@ -277,7 +279,7 @@ async function remote_pump_auto(payload_config) {
       return null
     }
 
-    console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) < value_in_Config(${config_garden_one.mean_humidity_value}), so turn on the Pump in Garden`, list_humidity_values)
+    console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) < value_in_Config(${config_garden_one.mean_humidity_value}), so turn on the Pump in Garden ${garden_index}`, list_humidity_values)
 
     // turn ON/OFF PUMP
     const resOn = await core.turn_on_pump(garden_index - 1)
