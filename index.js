@@ -236,8 +236,7 @@ async function remote_pump_auto(payload_config) {
         && config.status === true
     })
 
-    if (!config_garden_one) return consoleCatch({ code: 'garden_is_off' })
-
+    if (!config_garden_one) return consoleCatch({ code: `off_config_garden ${garden_index}` })
 
     const __static_garden_one = _.find(static.list_garden, gar => gar.garden_id === garden_index)
     const _static_garden_one = _.find(static_list_garden, gar => gar.garden_id === garden_index)
@@ -246,7 +245,7 @@ async function remote_pump_auto(payload_config) {
     const list_node_in_garden = _.filter(info_node, node => {
       return _.includes(static_garden_one.list_node_name, node.endpoint)
     })
-    if (list_node_in_garden.length === 0) return null
+    if (list_node_in_garden.length === 0) return consoleCatch({ code: `node_in_garden_already_offline` })
 
     const getListHumidityInGarden = async (list_node_in_garden, static_garden_one) => {
       return list_node_in_garden.map(node => {
@@ -260,8 +259,7 @@ async function remote_pump_auto(payload_config) {
     const list_humidity = await getListHumidityInGarden(list_node_in_garden, static_garden_one)
     const _list_humidity_vals = list_humidity.map(i => i.value)
     const __list_humidity_values = _list_humidity_vals.map(value => {
-      if (value > 1000) return null
-      if (value < 0) return null
+      if (value > 850 || value < 170) return null
       return value
     })
 
@@ -269,16 +267,16 @@ async function remote_pump_auto(payload_config) {
 
     //validate
     const list_humidity_values = _.reject(_list_humidity_values, val => val < 170 || val > 850)
-    if (list_humidity_values.length === 0) return null
+    if (list_humidity_values.length === 0) return consoleCatch({ code: `Nothing humidity value is valid` })
     const real_mean_humidity_val = _.mean(list_humidity_values)
 
-
+    console.info(`Humidity before filter ${_list_humidity_values}`)
     if (real_mean_humidity_val > config_garden_one.mean_humidity_value) {
-      console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) > value_in_Config(${config_garden_one.mean_humidity_value}), so do nothing`, _list_humidity_values)
+      console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) > value_in_Config(${config_garden_one.mean_humidity_value}), so do nothing`, list_humidity_values)
       return null
     }
 
-    console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) < value_in_Config(${config_garden_one.mean_humidity_value}), so turn on the Pump in Garden`, _list_humidity_values)
+    console.info(new Date(), `Real Mean Humidity value(${real_mean_humidity_val}) < value_in_Config(${config_garden_one.mean_humidity_value}), so turn on the Pump in Garden`, list_humidity_values)
 
     // turn ON/OFF PUMP
     const resOn = await core.turn_on_pump(garden_index - 1)
@@ -295,11 +293,7 @@ async function remote_pump_auto(payload_config) {
         node_info: _data_node_control
       })
     }, config_garden_one.about_time * 60 * 1000);
-
-
   });
-
-
 }
 
 client.on('config_remote_pump_automatically', async function (payload) {
@@ -309,8 +303,7 @@ client.on('config_remote_pump_automatically', async function (payload) {
   const config_isallowed = payload_config.filter(cf => !!cf.status)
   await setIntervalRemote(config_isallowed)
   await remote_pump_auto(config_isallowed)
-})
-
+});
 
 
 module.exports = client;
