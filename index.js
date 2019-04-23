@@ -8,7 +8,9 @@ console.log('connect', serverHost);
 const static = require('./static');
 
 const core = require('./core')
-let interval_listener = {}
+let interval_listener = {
+  update_config: {}
+}
 let timeout_listener = {}
 console.log('run NODE_ENV', process.env.NODE_ENV)
 
@@ -84,7 +86,7 @@ async function setIntervalRemote(payload_config) {
       // remote pump from humidity sensor value
       await remote_pump_auto([config])
     }, cycle_time * 60 * 1000 + index * 408);
-    interval_listener.update_config[`${index + 1}`] = instance
+    interval_listener.update_config[`garden${index + 1}`] = instance
   })
 }
 
