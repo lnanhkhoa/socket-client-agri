@@ -8,9 +8,8 @@ console.log('connect', serverHost);
 const static = require('./static');
 
 const core = require('./core')
-let interval_listener = {
-  update_config: {}
-}
+let interval_listener = {}
+let update_config_interval_listener = {}
 let timeout_listener = {}
 console.log('run NODE_ENV', process.env.NODE_ENV)
 
@@ -47,6 +46,7 @@ client.on('disconnect', function () {
   clearAllIntervalRemote()
   interval_listener = {}
   timeout_listener = {}
+  update_config_interval_listener = {}
 });
 
 client.on('connect', function () {
@@ -74,8 +74,11 @@ client.on('connect', function () {
 })
 
 function clearAllIntervalRemote() {
-  const list_idInterval = _.values(interval_listener.update_config)
-  clearInterval(list_idInterval)
+  const list_idInterval = _.values(update_config_interval_listener)
+  list_idInterval.forEach(element => {
+    clearInterval(element)
+  })
+  update_config_interval_listener = {}
 }
 
 async function setIntervalRemote(payload_config) {
@@ -86,7 +89,7 @@ async function setIntervalRemote(payload_config) {
       // remote pump from humidity sensor value
       await remote_pump_auto([config])
     }, cycle_time * 60 * 1000 + index * 408);
-    interval_listener.update_config[`garden${index + 1}`] = instance
+    update_config_interval_listener[`garden${index + 1}`] = instance
   })
 }
 
