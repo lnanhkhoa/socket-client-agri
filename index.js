@@ -84,9 +84,7 @@ async function setIntervalRemote(payload_config) {
       // remote pump from humidity sensor value
       await remote_pump_auto([config])
     }, cycle_time * 60 * 1000 + index * 408);
-    interval_listener.update_config = {
-      [index]: instance
-    }
+    interval_listener.update_config[index] = instance
   })
 }
 
@@ -303,8 +301,8 @@ client.on('config_remote_pump_automatically', async function (payload) {
   const list_config = payload.data.list_data
   payload_config = list_config
   const config_isallowed = payload_config.filter(cf => !!cf.status)
-  await setIntervalRemote(config_isallowed)
   await remote_pump_auto(config_isallowed)
+  await setIntervalRemote(config_isallowed)
 });
 
 
